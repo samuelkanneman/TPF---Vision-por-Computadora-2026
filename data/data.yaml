@@ -1,0 +1,27 @@
+# data.yaml - Dataset custom para YOLO26
+# Proyecto Integrador - Vision por Computadora 2026
+#
+# IMPORTANTE: Este dataset esta armado con el SET A (gastronomia argentina):
+#   - mate
+#   - termo
+#   - factura
+# Si elegiste otro set de clases, modificar la seccion `names` abajo.
+# Las clases NO pueden estar incluidas en las 80 clases de COCO.
+
+# Ruta absoluta o relativa al directorio raiz del dataset
+# (debe apuntar a la carpeta que contiene `images/` y `labels/`)
+path: .
+
+# Subcarpetas de train y validacion (relativas a `path`)
+train: images/train
+val: images/val
+
+# Nombres de las clases personalizadas
+# El indice (0, 1, 2) debe coincidir con el orden de los archivos .txt de labels
+names:
+  0: mate
+  1: termo
+  2: factura
+
+# Numero de clases (opcional, ultralytics puede inferirlo)
+nc: 3

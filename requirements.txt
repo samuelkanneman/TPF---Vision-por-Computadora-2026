@@ -1,0 +1,15 @@
+# Dependencias del Trabajo Final - Vision por Computadora 2026
+# Instalar con: pip install -r requirements.txt
+
+ultralytics>=8.0.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+torch>=2.0.0
+torchvision>=0.15.0
+Pillow>=10.0.0
+PyYAML>=6.0
+tqdm>=4.65.0
+
+# Opcionales - para etiquetado y descarga de datasets
+# roboflow>=1.0.0
+# labelImg>=1.8.0

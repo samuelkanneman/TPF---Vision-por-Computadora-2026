@@ -1,0 +1,59 @@
+# .gitignore - Trabajo Final Vision por Computadora
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Entornos virtuales
+venv/
+env/
+.venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Outputs pesados
+runs/
+*.pt
+*.onnx
+*.torchscript
+*.engine
+
+# Videos (son pesados, no se suben a git)
+videos/input/*
+!videos/input/.gitkeep
+videos/output/*
+!videos/output/.gitkeep
+
+# Dataset (puede ser muy pesado; si lo suben, quitar de gitignore)
+data/images/train/*
+!data/images/train/.gitkeep
+data/images/val/*
+!data/images/val/.gitkeep
+# Si querés subir los labels pequeños:
+# !data/labels/train/
+# !data/labels/val/
+
+# Logs
+*.log
+logs/
+
+# Modelo
+best.pt
+last.pt
