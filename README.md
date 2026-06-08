@@ -99,8 +99,8 @@ Abrir y ejecutar `training/train_notebook.ipynb` celda por celda. Al finalizar, 
 - [x] Dataset etiquetado (`data/`)
 - [x] `data/data.yaml`
 - [x] `best.pt` (pesos entrenados)
-- [ ] Video original
-- [ ] Video procesado final
+- [x] Video original
+- [x] Video procesado final
 - [ ] Presentación (siguiendo `presentacion/estructura_presentacion.md`)
 
 ---
