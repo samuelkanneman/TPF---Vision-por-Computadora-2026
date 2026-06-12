@@ -135,8 +135,9 @@ pip install -r requirements.txt
 
 ### 5.2. Correr inferencia sobre un video
 
-1. Copiar videos a `videos/input/`. Ya hay 3 (video1/2/3.mp4) — están
-   gitignoreados, en Colab llegan por el Drive compartido.
+1. Los 3 videos (video1/2/3.mp4, ~6.5 MB) están **commiteados** en
+   `videos/input/` — un clon del repo ya los tiene (clave para el flujo
+   de la extensión de Colab en VS Code, que clona desde GitHub).
 2. Tener `best.pt` en la raíz (lo genera el notebook de training).
 3. Abrir [`inference/inference_notebook.ipynb`](./inference/inference_notebook.ipynb)
    y correr todas las celdas: procesa **todos** los videos de `videos/input/`

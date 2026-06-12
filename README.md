@@ -76,7 +76,7 @@ Abrir y ejecutar `training/train_notebook.ipynb` (Run All). Funciona en **local 
 
 ### 4. Procesar los videos
 
-1. Tener los videos en `videos/input/` (ya hay 3; están gitignoreados, en Colab llegan por Drive).
+1. Tener los videos en `videos/input/` (los 3 videos ya están commiteados en el repo).
 2. Abrir y ejecutar `inference/inference_notebook.ipynb` (Run All): procesa **todos** los videos de `videos/input/` con los 3 modelos en paralelo.
 3. Los videos procesados quedan en `videos/output/resultado_<nombre>.mp4`.
 

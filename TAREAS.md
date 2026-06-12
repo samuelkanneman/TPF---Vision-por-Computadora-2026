@@ -98,7 +98,7 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
   - ✅ Las 3 clases custom visibles (mate, termo, factura — para bboxes)
 - [ ] **Formato**: `.mp4` o `.avi` (codec compatible con OpenCV)
 - [ ] **Resolución sugerida**: 720p o 1080p (evitar 4K por performance)
-- [x] **Copiar videos** a `videos/input/` (gitignoreados; en Colab llegan por el Drive compartido)
+- [x] **Copiar videos** a `videos/input/` (commiteados en el repo, ~6.5 MB — el clon de Colab ya los tiene)
 
 ### 💡 Tips para los videos
 

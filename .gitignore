@@ -35,11 +35,14 @@ runs/
 *.torchscript
 *.engine
 
-# Videos (son pesados, no se suben a git)
-videos/input/*
-!videos/input/.gitkeep
+# Videos de entrada: SI se commitean (son ~6.5 MB y el flujo de Colab
+# clona el repo desde GitHub, necesita tenerlos). Los de salida no.
 videos/output/*
 !videos/output/.gitkeep
+
+# Zips de resultados que generan los notebooks para descargar desde Colab
+resultados_entrenamiento.zip
+videos_procesados.zip
 
 # Dataset (puede ser muy pesado; si lo suben, quitar de gitignore)
 # NOTA: data/mate-termo/ (export de Roboflow, ~7 MB) SI se commitea.
