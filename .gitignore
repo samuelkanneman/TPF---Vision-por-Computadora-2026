@@ -44,6 +44,9 @@ videos/output/*
 resultados_entrenamiento.zip
 videos_procesados.zip
 
+# Archivos de lock de Office (PowerPoint abierto)
+~$*
+
 # Dataset (puede ser muy pesado; si lo suben, quitar de gitignore)
 # NOTA: data/mate-termo/ (export de Roboflow, ~7 MB) SI se commitea.
 data/images/train/*
