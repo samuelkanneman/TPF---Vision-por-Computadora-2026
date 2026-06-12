@@ -7,18 +7,16 @@ footer: "Trabajo Final — Visión por Computadora 2026"
 ---
 
 <!--
-BORRADOR DE PRESENTACIÓN (14 slides, según estructura_presentacion.md)
+PRESENTACIÓN FINAL (14 slides, según estructura_presentacion.md)
 
-Cómo usarlo:
-  - Opción A (Marp): instalar la extensión "Marp for VS Code" y exportar a PDF/PPTX,
-    o con CLI: npx @marp-team/marp-cli presentacion.md --pptx
-  - Opción B: copiar el contenido slide por slide a Google Slides / PowerPoint.
+Cómo exportar:
+  - Opción A (Marp): extensión "Marp for VS Code" → Export Slide Deck → PPTX o PDF.
+    O por CLI: npx @marp-team/marp-cli presentacion.md --pptx --allow-local-files
+  - Opción B: copiar el contenido slide por slide a Google Slides / PowerPoint
+    (las imágenes están en presentacion/img/).
 
-Los bloques [INSERTAR: ...] se completan con el material que sale del
-entrenamiento y la inferencia (ver AGENTS.md sección 5.3):
-  - runs/detect/train/results.png, confusion_matrix.png, PR_curve.png
-  - runs/detect/predict_test/  (predicciones sobre el set de validación)
-  - frames de videos/output/resultado_video*.mp4
+Único pendiente manual: en la slide 10 conviene reproducir el video en vivo
+(videos/output/resultado_video3.mp4) o convertirlo a GIF si lo prefieren embebido.
 -->
 
 # Detección, Segmentación y Pose con YOLO26
@@ -61,51 +59,56 @@ Junio 2026
 | **Instancias (train)** | 208 factura · 106 mate · 71 termo |
 | **Etiquetado** | Roboflow (polígonos YOLO), licencia CC BY 4.0 |
 
-[INSERTAR: captura de Roboflow con el dataset etiquetado]
-[INSERTAR: salida del sanity check visual del train notebook (celda 3.1)]
+![w:900](img/sanity_check_labels.png)
+*Sanity check del etiquetado: polígonos de los labels sobre imágenes de train.*
 
 ---
 
 # Configuración del entrenamiento
 
-- **Modelo base**: `yolo26s.pt` (small) — *transfer learning* desde COCO
-  - Primera iteración con `yolo26n` (nano): mAP50 0.59 → se subió de tamaño
-- **Épocas**: 150 (con *early stopping*, `patience=30`)
+- **Modelo base**: `yolo26n.pt` (nano) — *transfer learning* desde COCO
+- **Épocas**: 150 con *early stopping* (`patience=30`) → cortó en la **119**, mejor época la **89**
 - **Batch size**: 16 · **Image size**: 640
 - **Optimizador**: AdamW, `lr0 = 0.001`
 - **Augmentations**: las default de Ultralytics (mosaic, flips, HSV, etc.)
-- **Hardware**: Google Colab (GPU T4)
+- **Hardware**: Google Colab (GPU T4) — entrenamiento completo en **~8 minutos**
+
+> También probamos `yolo26s` (small): **overfitteó** con un dataset tan chico (ver slide 12).
 
 ---
 
 # Métricas de entrenamiento
 
-| Métrica | Objetivo | Obtenido |
-|---------|----------|----------|
-| mAP50 | ≥ 0.70 | [INSERTAR] |
-| mAP50-95 | ≥ 0.55 | [INSERTAR] |
-| Precision | ≥ 0.80 | [INSERTAR] |
-| Recall | ≥ 0.70 | [INSERTAR] |
+| Métrica | Objetivo | Obtenido | |
+|---------|----------|----------|---|
+| mAP50 (global) | ≥ 0.70 | **0.57** | ⚠️ |
+| mAP50 — termo | | **0.76** | ✅ |
+| mAP50 — mate | | **0.66** | ~ |
+| mAP50 — factura | | **0.29** | ❌ |
+| mAP50-95 | ≥ 0.55 | 0.35 | ⚠️ |
+| Precision / Recall | ≥ 0.80 / ≥ 0.70 | 0.56 / 0.62 | ⚠️ |
 
-[INSERTAR: runs/detect/train/results.png — curvas de loss y métricas]
-[INSERTAR: runs/detect/train/confusion_matrix.png]
-[INSERTAR: runs/detect/train/PR_curve.png]
+![w:560](img/results.png) ![w:380](img/BoxPR_curve.png)
+
+---
+
+# Métricas: ¿dónde falla el modelo?
+
+![w:520](img/confusion_matrix_normalized.png)
+
+- Casi **no hay confusión entre clases** — el problema es de **detección** (recall): la mayoría de los errores son objetos reales predichos como *background*.
+- `factura` concentra el problema: objetos chicos, **agrupados y solapados** (bandejas), con posible etiquetado incompleto.
+- El set de validación es chico (31 imágenes, solo 8 con facturas) → métricas con mucha varianza.
 
 ---
 
 # Resultados del modelo custom
 
-**Predicciones sobre el set de validación** (`runs/detect/predict_test/`):
+![w:430](img/predicciones_test/Screenshot-from-2026-06-09-19-02-15_png.rf.dad9dbeafc3fdc5c2e0ba8c812605051.jpg) ![w:430](img/predicciones_test/Screenshot-from-2026-06-09-18-43-39_png.rf.daedffed001bb6da486566f5e40b97c2.jpg)
 
-[INSERTAR: 2-3 ejemplos de predicciones correctas]
-
-[INSERTAR: 1-2 ejemplos de errores o falsos positivos]
-
-**Discusión**: qué clase funcionó mejor / peor y por qué.
-En el primer entrenamiento (yolo26n, 80 épocas), `factura` fue la clase más débil
-(mAP50 ≈ 0.25 vs 0.72 de `mate` y 0.80 de `termo`) **a pesar de ser la que más
-instancias tiene** — las facturas aparecen en grupos, chicas y pegadas, lo que
-sugiere etiquetado incompleto en bandejas más que falta de datos.
+- **Izquierda**: detecta facturas con buena confianza (0.70), pero solo 2 de 4 — el solapamiento penaliza el recall.
+- **Derecha**: termo detectado (0.74), pero el mate en primer plano no — ángulos poco representados en train.
+- Más ejemplos en `presentacion/img/predicciones_test/` (31 imágenes de validación).
 
 ---
 
@@ -121,8 +124,8 @@ sugiere etiquetado incompleto en bandejas más que falta de datos.
  │ yolo26n-seg.pt  │   │ yolo26n-pose.pt  │   │    best.pt      │
  │ Segmentación    │   │ Pose (COCO-17)   │   │ Detección custom│
  │ COCO            │   │                  │   │ factura/mate/   │
- │ (sin person ni  │   │                  │   │ termo           │
- │  clases custom) │   │                  │   │                 │
+ │ (con exclusión  │   │                  │   │ termo           │
+ │  de clases)     │   │                  │   │                 │
  └────────┬────────┘   └────────┬─────────┘   └────────┬────────┘
           └──────────────────────┼──────────────────────┘
                                  ▼
@@ -140,55 +143,63 @@ sugiere etiquetado incompleto en bandejas más que falta de datos.
 
 # Lógica de exclusión
 
-**¿Por qué excluimos clases de la segmentación COCO?**
+**Cada objeto es responsabilidad de exactamente un modelo:**
 
-- `person` → ya la representa el modelo de **pose** (skeleton); dibujar también la máscara duplicaría la anotación y ensuciaría el frame.
+- `person` → la dibuja el modelo de **pose** (skeleton); se excluye de la segmentación para no duplicar.
 - Clases custom → las dibuja el detector **custom** con bbox + confianza.
 - **Pasó en la práctica**: COCO veía las facturas como `donut`/`cake` y el mate como `cup`, superponiendo máscaras sobre nuestras cajas → agregamos esas clases a la lista de exclusión (`EXTRA_EXCLUDE`).
 
-**Resultado**: cada objeto es responsabilidad de exactamente **un** modelo →
-frame limpio y sin solapamientos.
+**Resultado**: frame limpio, sin anotaciones contradictorias.
 
 ---
 
 # Demostración: video procesado
 
-[INSERTAR: video resultado_video1.mp4 embebido, o GIF corto si el archivo es pesado]
+Videos completos en `videos/output/` (reproducir `resultado_video3.mp4` en vivo):
 
-Qué observar:
-- 🟦 Máscaras de segmentación sobre objetos COCO
-- 🦴 Skeletons sobre las personas
-- 🟥 Bounding boxes con confianza sobre factura / mate / termo
+![w:850](img/frames/frames_video3.png)
+
+- 🟨 Bounding boxes con confianza sobre factura / mate / termo (modelo custom)
+- 🟦 Máscaras de segmentación COCO (`bottle`, `bowl`, `dining table`)
 - 📊 Overlay con FPS y conteos por categoría
 
 ---
 
 # Ejemplos de frames
 
-[INSERTAR: 3-4 frames destacados de videos/output/ — los genera la última celda del inference notebook]
+![w:850](img/frames/frames_video1.png)
+*video1: pose en acción — skeleton sobre el conductor tomando mate.*
 
-[INSERTAR: comparativa antes / después del mismo frame]
+![w:850](img/frames/frames_video2.png)
+*video2: mate y picnic al aire libre — detección custom + segmentación COCO.*
 
 ---
 
 # Dificultades encontradas
 
-- **Nombres y orden de clases**: el export de Roboflow definía `0: bolleria, 1: mate, 2: termo`, distinto a la config inicial del repo → se corrigió `data.yaml` respetando los índices (si no, las clases quedaban cruzadas).
-- **Formato de labels**: Roboflow exportó polígonos (segmentación) en vez de bboxes → Ultralytics los convierte automáticamente para detección.
-- **Clase difícil**: `factura` rinde peor que `mate`/`termo` aun siendo la de más instancias (208 en train) — objetos chicos, agrupados en bandejas, posible etiquetado incompleto.
-- **Imágenes 512×512 con stretch** (preprocesado de Roboflow) → pérdida de relación de aspecto.
-- **Trabajo distribuido**: entrenamiento en Colab + repo en GitHub + videos por Drive.
-- [INSERTAR: dificultades de performance/FPS observadas en la inferencia]
+- **Orden de clases**: el export de Roboflow definía `0: bolleria, 1: mate, 2: termo`, distinto a la config inicial del repo → se corrigió `data.yaml` respetando los índices (si no, las clases quedaban cruzadas).
+- **Formato de labels**: Roboflow exportó polígonos (segmentación) → Ultralytics los convierte automáticamente para detección.
+- **Selección de modelo** (3 experimentos):
+
+| Run | Modelo | Épocas | mAP50 | Precision | Recall |
+|-----|--------|--------|-------|-----------|--------|
+| v1 | yolo26n | 80 | 0.59 | 0.62 | 0.53 |
+| v2 | yolo26s | 150 (stop en 78) | 0.53 | 0.73 | 0.42 |
+| **v3 final** | **yolo26n** | **150 (stop en 119)** | **0.57** | 0.56 | **0.62** |
+
+→ con 124 imágenes, el modelo **small overfittea**; el nano generaliza mejor.
+
+- **Clase difícil**: `factura` (0.29) — objetos chicos y agrupados, aun siendo la clase con más instancias.
 
 ---
 
 # Conclusiones
 
-- ✅ Pipeline funcional que integra **3 tareas de visión** en un solo paso de video.
-- ✅ **Transfer learning** permite entrenar un detector útil con solo ~150 imágenes.
-- ✅ La **calidad y consistencia del dataset** (orden de clases, formato de labels) importa tanto como el modelo.
+- ✅ Pipeline funcional que integra **3 tareas de visión** en un solo paso de video, a **12-17 FPS** en una T4 (objetivo ≥ 5, ideal ≥ 15).
+- ✅ **Transfer learning** permite un detector útil con solo ~150 imágenes — pero el techo lo pone el **dataset**, no el modelo (más capacidad = overfit).
+- ✅ La **calidad del etiquetado** (orden de clases, formato, completitud en objetos agrupados) importa tanto como la arquitectura.
 
-**Líneas futuras**: más datos y balanceo de clases · tracking entre frames (ByteTrack) · export a ONNX/TensorRT para más FPS · más clases custom.
+**Líneas futuras**: más datos y mejor etiquetado de facturas · tracking entre frames (ByteTrack) · export a ONNX/TensorRT para más FPS · más clases custom.
 
 ---
 

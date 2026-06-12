@@ -11,7 +11,7 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 | Sem. | Fechas | Foco | Estado |
 |------|--------|------|--------|
 | S1 | Lun 2 – Dom 8 | Dataset + setup | ✅ |
-| S2 | Lun 9 – Dom 15 | Entrenamiento + video + entrega | ⏳ (al 12/06: falta entrenar, inferir y completar slides) |
+| S2 | Lun 9 – Dom 15 | Entrenamiento + video + entrega | ✅ (12/06: entrenado, videos procesados, slides armadas — falta exportar PPTX y entregar) |
 
 ---
 
@@ -47,7 +47,7 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 - [x] **Split 80/20 train/val** → 124 train / 31 valid
 - [x] **Integrar al repo** → `data/mate-termo/` (estructura Roboflow, se commitea)
 - [x] **Actualizar `data/data.yaml`** → corregido: `0: factura, 1: mate, 2: termo` (orden del export de Roboflow)
-- [ ] **Sanity check**: correr la celda 3.1 del train notebook (dibuja labels sobre imágenes) antes de entrenar
+- [x] **Sanity check**: corrido (celda 3.1 del train notebook) — etiquetado y orden de clases verificados ✓
 
 ### 🛠 Herramientas de etiquetado
 
@@ -64,19 +64,14 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 
 > Archivo: `training/train_notebook.ipynb`
 
-- [ ] **Verificar entorno**: `pip install -r requirements.txt`
-- [ ] **Verificar GPU** (celda 2 del notebook)
-- [ ] **Verificar dataset** (celda 3) — confirmar que cuenta las imágenes y labels correctamente
-- [ ] **Ajustar hiperparámetros** en celda 5 según VRAM disponible:
-  - `epochs`: 50-100 (recomendado 80)
-  - `batch`: 8-32 (16 si tenés 8GB+ VRAM)
-  - `imgsz`: 640 (default)
-  - `optimizer`: AdamW
-- [ ] **Lanzar entrenamiento** (celda 5) — puede tardar 30 min a 4 horas según hardware
-- [ ] **Revisar métricas** (celda 6): mAP50, mAP50-95, precision, recall
-  - Meta sugerida: **mAP50 ≥ 0.70** para considerar el modelo aceptable
-- [ ] **Copiar `best.pt`** a la raíz del proyecto (celda 8)
-- [ ] **Si mAP < 0.50**: re-entrenar con más datos, más épocas, o probar `yolo26s.pt`
+- [x] **Verificar entorno** → Colab vía extensión de VS Code (T4)
+- [x] **Verificar GPU** → Tesla T4, 15.6 GB
+- [x] **Verificar dataset** → 124 train / 31 valid ✓
+- [x] **Ajustar hiperparámetros** → `yolo26n`, 150 épocas, batch 16, AdamW, patience 30
+- [x] **Lanzar entrenamiento** → 3 corridas (~8 min c/u en T4); final: early stop en época 119
+- [x] **Revisar métricas** → **mAP50 0.57** (termo 0.76 ✓, mate 0.66, factura 0.29) — no se alcanzó el 0.70 global; causa analizada y documentada (recall en facturas agrupadas, dataset chico)
+- [x] **Copiar `best.pt`** → en la raíz del repo (5.4 MB)
+- [x] **Iteración** → se probó `yolo26s`: overfit (0.53); el nano generaliza mejor con este dataset
 
 ### 🔄 Iteración si las métricas son bajas
 
@@ -113,14 +108,14 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 
 > Archivo: `inference/inference_notebook.ipynb` + `inference/utils.py`
 
-- [ ] **Probar el notebook con un video corto primero** (configurar `MAX_FRAMES=100` para debug)
-- [ ] **Verificar la salida**:
-  - ✅ Segmentaciones COCO se ven (sin `person` ni clases custom)
-  - ✅ Skeletons de personas se ven correctamente
+- [x] **Probar el notebook** → corrido completo en Colab
+- [x] **Verificar la salida**:
+  - ✅ Segmentaciones COCO se ven (sin `person`, clases custom, ni donut/cake/cup)
+  - ✅ Skeletons de personas se ven correctamente (video1: conductor tomando mate)
   - ✅ Bboxes de clases custom con label + confianza
-- [ ] **Ajustar umbral de confianza** si hay demasiado ruido (subir a 0.5-0.6)
-- [ ] **Probar con los 2-3 videos** y comparar resultados
-- [ ] **Exportar videos finales** a `videos/output/`
+- [x] **Umbral de confianza** → 0.4 (sin ruido visible)
+- [x] **Probar con los 3 videos** → 17.5 / 17.5 / 12.3 FPS en T4
+- [x] **Exportar videos finales** → `videos/output/resultado_video{1,2,3}.mp4`
 
 ### 🐛 Debugging común
 
@@ -139,26 +134,27 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 
 > **Entrega: lunes 15 de junio** · **Presentación: primer día hábil de la última semana**
 
-- [x] **Limpiar notebooks** → outputs limpios, markdown explicativo, listos para Run All en Colab
-- [ ] **Actualizar README.md** con los resultados finales (dataset ya actualizado ✓; faltan mAP y FPS post-entrenamiento)
-- [ ] **Armar presentación** → borrador con las 14 slides en `presentacion/presentacion.md` ✓; completar los `[INSERTAR: ...]` con métricas y frames
-- [ ] **Capturar frames** del video procesado para las slides
-- [ ] **Capturar gráficas de Ultralytics** (loss, matriz de confusión, PR) — están en `runs/detect/train/`
-- [ ] **Verificar entregables** (checklist abajo)
-- [ ] **Hacer commit final** y push a GitHub
+- [x] **Limpiar notebooks** → markdown explicativo; se entregan **con los outputs de la corrida final** (para que se vea la ejecución)
+- [x] **Actualizar README.md** → resultados finales, historial de experimentos y FPS
+- [x] **Armar presentación** → `presentacion/presentacion.md` (15 slides, Marp) con métricas e imágenes reales
+- [x] **Capturar frames** → `presentacion/img/frames/` (extraídos de los videos procesados)
+- [x] **Capturar gráficas de Ultralytics** → `presentacion/img/` (results, confusion matrix, curvas P/R/PR/F1)
+- [x] **Verificar entregables** (checklist abajo)
+- [x] **Hacer commit final** y push a GitHub
+- [ ] **Exportar presentación a PPTX/PDF** (Marp for VS Code → Export Slide Deck) y ensayarla
 
 ### 📦 Checklist de entregables
 
-- [ ] `training/train_notebook.ipynb` (entregable)
-- [ ] `inference/inference_notebook.ipynb` (entregable)
-- [ ] `inference/utils.py`
-- [ ] `data/` con imágenes y labels (o `.zip` aparte si es muy pesado)
-- [ ] `data/data.yaml`
-- [ ] `best.pt` (pesos entrenados)
-- [ ] `videos/input/` — videos originales
-- [ ] `videos/output/` — videos procesados finales
-- [ ] `presentacion/` — slides en `.pdf` o `.pptx`
-- [ ] `README.md` actualizado
+- [x] `training/train_notebook.ipynb` (entregable, con outputs de la corrida final)
+- [x] `inference/inference_notebook.ipynb` (entregable, con outputs de la corrida final)
+- [x] `inference/utils.py`
+- [x] `data/mate-termo/` con imágenes y labels (commiteado en el repo)
+- [x] `data/data.yaml`
+- [x] `best.pt` (pesos entrenados, en la raíz)
+- [x] `videos/input/` — videos originales (commiteados)
+- [x] `videos/output/` — videos procesados finales (commiteados)
+- [x] `presentacion/` — fuente Marp + imágenes (exportar a `.pdf`/`.pptx` antes de presentar)
+- [x] `README.md` actualizado
 
 ---
 

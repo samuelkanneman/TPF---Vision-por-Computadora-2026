@@ -84,14 +84,33 @@ Abrir y ejecutar `training/train_notebook.ipynb` (Run All). Funciona en **local 
 
 ## 🧪 Modelo y configuración usada
 
-- **Modelo base**: `yolo26s.pt` (transfer learning) — [YOLO26](https://docs.ultralytics.com/models/yolo26) está disponible en `ultralytics >= 8.4` (enero 2026); el notebook tiene fallback automático a `yolo11s.pt`.
-- **Épocas**: 150 (early stopping con `patience=30`)
+- **Modelo base**: `yolo26n.pt` (transfer learning) — [YOLO26](https://docs.ultralytics.com/models/yolo26) está disponible en `ultralytics >= 8.4` (enero 2026); el notebook tiene fallback automático a `yolo11n.pt`.
+- **Épocas**: 150 con early stopping (`patience=30`) — el run final cortó en la época 119 (mejor: la 89)
 - **Batch size**: 16
 - **Image size**: 640
 - **Optimizador**: AdamW
 - **Augmentations**: Activadas (default Ultralytics)
 
-> El primer entrenamiento (yolo26n, 80 épocas) dio mAP50 0.59 global con `factura` en 0.25 — se subió a `yolo26s` y más épocas para la versión final.
+## 📈 Resultados finales
+
+| Métrica | Objetivo | Obtenido |
+|---------|----------|----------|
+| mAP50 (global) | ≥ 0.70 | **0.57** |
+| mAP50 — termo | | 0.76 |
+| mAP50 — mate | | 0.66 |
+| mAP50 — factura | | 0.29 |
+| Precision / Recall | 0.80 / 0.70 | 0.56 / 0.62 |
+| FPS del pipeline (T4) | ≥ 5 (ideal 15) | **12.3 – 17.5** |
+
+Historial de experimentos (mismo dataset):
+
+| Run | Modelo | Épocas | mAP50 | Conclusión |
+|-----|--------|--------|-------|------------|
+| v1 | yolo26n | 80 | 0.59 | la curva seguía subiendo |
+| v2 | yolo26s | 150 (stop 78) | 0.53 | **overfit** — el small no ayuda con 124 imágenes |
+| v3 (final) | yolo26n | 150 (stop 119) | 0.57 | mejor recall (0.62); nivel estable del nano |
+
+> Análisis: casi no hay confusión entre clases — los errores son objetos no detectados (recall), concentrados en `factura` (objetos chicos, agrupados en bandejas). Detalle en `presentacion/presentacion.md`.
 
 > Ajustar estos valores según VRAM disponible y tiempo de entrenamiento.
 
@@ -104,9 +123,9 @@ Abrir y ejecutar `training/train_notebook.ipynb` (Run All). Funciona en **local 
 - [x] Dataset etiquetado (`data/mate-termo/`, 155 imágenes)
 - [x] `data/data.yaml`
 - [x] Videos originales (`videos/input/`, 3 videos)
-- [ ] `best.pt` (pesos entrenados — correr el train notebook en Colab)
-- [ ] Videos procesados finales (`videos/output/` — correr el inference notebook)
-- [ ] Presentación (borrador en `presentacion/presentacion.md`, completar con métricas y frames)
+- [x] `best.pt` (pesos entrenados, yolo26n — en la raíz del repo)
+- [x] Videos procesados finales (`videos/output/resultado_video{1,2,3}.mp4`)
+- [x] Presentación (`presentacion/presentacion.md`, 15 slides con métricas y material en `presentacion/img/` — exportar a PPTX/PDF con Marp)
 
 ---
 

@@ -116,11 +116,16 @@ pip install -r requirements.txt
    generación de `data/data_runtime.yaml` (3.2) — el entrenamiento usa ese
    yaml con rutas absolutas.
 4. Hiperparámetros (sección 5):
-   - `MODEL_NAME = 'yolo26s.pt'` (fallback automático a `yolo11s.pt`)
+   - `MODEL_NAME = 'yolo26n.pt'` (fallback automático a `yolo11n.pt`)
    - `data=data/data_runtime.yaml` (autogenerado)
    - `epochs=150`, `batch=16` (bajar a 8 si OOM), `imgsz=640`
    - `optimizer='AdamW'`, `patience=30`
-   - Historial: yolo26n + 80 ep dio mAP50 0.59 (factura 0.25, mate 0.72, termo 0.80)
+   - Historial de experimentos (NO repetir el small sin más datos):
+     | Run | Modelo | Épocas | mAP50 | Nota |
+     |-----|--------|--------|-------|------|
+     | v1 | yolo26n | 80 | 0.59 | curva aún subiendo |
+     | v2 | yolo26s | 150 (stop 78) | 0.53 | overfit con 124 imgs |
+     | v3 final | yolo26n | 150 (stop 119) | **0.57** | mejor recall (0.62) |
 5. Correr. Resultado en `runs/detect/train/weights/best.pt`.
 6. Copiar `best.pt` a la raíz (sección 8 del notebook ya lo hace).
 
@@ -172,13 +177,15 @@ El pipeline aplica los 3 modelos en paralelo a cada frame y dibuja:
   - `refactor:` cambios que no agregan features ni fixean bugs
 - **NO commitear** (ver `.gitignore`):
   - `runs/` (outputs de Ultralytics)
-  - `*.pt` (modelos entrenados)
-  - `videos/output/*` (videos procesados, son pesados)
-  - `__pycache__/`, `.venv/`, etc.
+  - `__pycache__/`, `.venv/`, los zips de resultados, etc.
+  - **Excepción de entrega**: `best.pt` y `videos/output/*.mp4` se commitearon
+    con `git add -f` como entregables finales del TP (quedan trackeados).
 
 ### 6.2. Notebooks
 
-- **Limpiar outputs antes de commitear**: `Kernel → Restart & Clear All Outputs`
+- **Limpiar outputs antes de commitear** (`Kernel → Restart & Clear All Outputs`)
+  durante el desarrollo. **Excepción**: la entrega final se commiteó CON los
+  outputs de la corrida definitiva, para que la ejecución sea visible.
 - Mantener las celdas en orden lógico: imports → setup → config → ejecución → resultados
 - Una sola cosa por celda, con markdown explicativo entre bloques
 
@@ -223,15 +230,14 @@ El pipeline aplica los 3 modelos en paralelo a cada frame y dibuja:
 
 - [x] Integrar el dataset de Roboflow (`data/mate-termo/`, 155 imgs) al repo
 - [x] Corregir `data/data.yaml` (orden de clases `0=factura, 1=mate, 2=termo`)
-- [x] Dejar los notebooks listos para Run-All en Colab (sanity check incluido)
-- [x] Actualizar `README.md` con el dataset real (155 imgs, Roboflow)
-- [x] Borrador de presentación en `presentacion/presentacion.md`
-- [ ] **CRÍTICO** — Entrenar en Colab (Run All del train notebook) y validar
-      que el sanity check visual y las métricas dan bien (meta: mAP50 ≥ 0.70)
-- [ ] Correr inferencia sobre los 3 videos y verificar la salida visualmente
-- [ ] Capturar material para las slides (loss, PR, confusion, frames) y
-      completar los `[INSERTAR: ...]` de `presentacion/presentacion.md`
-- [ ] Hacer commit final y push antes del **15/06/2026**
+- [x] Entrenar en Colab → modelo final yolo26n, mAP50 0.57 (termo 0.76, mate 0.66,
+      factura 0.29) — el 0.70 global no se alcanzó; causa analizada en README/slides
+- [x] Correr inferencia sobre los 3 videos → `videos/output/`, 12-17 FPS en T4
+- [x] Capturar material para las slides → `presentacion/img/`
+- [x] Presentación completa en `presentacion/presentacion.md` (15 slides, Marp)
+- [x] Commit final y push (entregables incluidos: best.pt, videos, notebooks con outputs)
+- [ ] Exportar la presentación a PPTX/PDF y ensayar (antes del primer día hábil
+      de la última semana)
 
 ---
 
@@ -244,8 +250,9 @@ El pipeline aplica los 3 modelos en paralelo a cada frame y dibuja:
 - Si encontrás un bug, **explicar la causa raíz** antes de proponer fix.
 - Si entrenás un modelo, **documentar las métricas resultantes** en la
   sección 5.1 (o crear un `EXPERIMENTS.md`).
-- **No commitear pesos** (`.pt`) ni outputs pesados. El `.gitignore` ya
-  los excluye, mantenerlo así.
+- **No commitear pesos ni outputs pesados** durante el desarrollo (el
+  `.gitignore` los excluye). Los entregables finales (`best.pt`, videos
+  procesados) ya están trackeados con `add -f`; no agregar más binarios.
 - Si el usuario está apurado (deadline 15/06), priorizar funcionalidad
   sobre perfección.
 
