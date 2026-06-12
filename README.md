@@ -10,14 +10,15 @@ Proyecto integrador que aplica modelos de la familia YOLO para detectar clases p
 
 ```
 Trabajo Final/
-├── data/                          # Dataset custom (no se sube a git si es grande)
-│   ├── images/
-│   │   ├── train/                 # ≥40 imágenes por clase
-│   │   └── val/                   # ≥10 imágenes por clase
-│   ├── labels/
-│   │   ├── train/                 # Etiquetas en formato YOLO
-│   │   └── val/
-│   └── data.yaml                  # Configuración del dataset
+├── data/
+│   ├── data.yaml                  # Configuración del dataset (apunta a mate-termo/)
+│   └── mate-termo/                # Dataset custom (export de Roboflow, 155 imágenes)
+│       ├── train/
+│       │   ├── images/            # 124 imágenes
+│       │   └── labels/            # Labels YOLO (polígonos)
+│       └── valid/
+│           ├── images/            # 31 imágenes
+│           └── labels/
 ├── training/
 │   └── train_notebook.ipynb       # Notebook de entrenamiento
 ├── inference/
@@ -38,15 +39,22 @@ Trabajo Final/
 
 ---
 
-## 🎯 Clases personalizadas (Set A por defecto)
+## 🎯 Clases personalizadas (Set A)
 
 | ID | Clase   | Descripción                            |
 |----|---------|----------------------------------------|
-| 0  | mate    | Mate (recipiente para yerba mate)      |
-| 1  | termo   | Termo para agua caliente               |
-| 2  | factura | Factura / pan dulce de panadería       |
+| 0  | factura | Factura / pan dulce de panadería       |
+| 1  | mate    | Mate (recipiente para yerba mate)      |
+| 2  | termo   | Termo para agua caliente               |
 
-> Si querés usar otras clases (Set B: herramientas, Set C: deportivo, Set D: EPP), modificá la sección `names` de `data/data.yaml` y re-etiquetá las imágenes.
+> ⚠️ Este es el **orden del export de Roboflow** (donde la clase 0 se llama `bolleria`; se renombró a `factura` manteniendo los índices). No reordenar `names` en `data/data.yaml`: los labels usan estos índices.
+
+### 📊 Dataset
+
+- **155 imágenes** (124 train / 31 valid, split 80/20), etiquetadas con [Roboflow](https://universe.roboflow.com/federicos-workspace-5cgiu/mate-termo-factura/dataset/1) (licencia CC BY 4.0).
+- Instancias en train: 172 factura · 55 mate · 35 termo.
+- Labels en formato polígono YOLO (export de segmentación); ultralytics los convierte automáticamente a bounding boxes para entrenar detección.
+- El dataset está **incluido en el repo** (`data/mate-termo/`, ~7 MB): con clonar alcanza, también en Colab.
 
 ---
 
@@ -58,30 +66,25 @@ Trabajo Final/
 pip install -r requirements.txt
 ```
 
-### 2. Armar el dataset
+### 2. Dataset
 
-1. Recolectar **≥50 imágenes por clase** (fotos propias, datasets públicos o descarga web).
-2. Etiquetar con [Roboflow](https://roboflow.com), [CVAT](https://cvat.org), [LabelImg](https://github.com/tzutalin/labelImg) o MakeSense.ai en formato YOLO.
-3. Dividir en `train` (80%) y `val` (20%).
-4. Colocar imágenes y labels en `data/images/{train,val}/` y `data/labels/{train,val}/` respectivamente.
-5. Verificar que `data/data.yaml` apunta a las rutas correctas.
+Ya está incluido en `data/mate-termo/` (export de Roboflow). El notebook de entrenamiento lo valida, muestra un **sanity check visual** del etiquetado y genera la config con rutas absolutas automáticamente.
 
 ### 3. Entrenar el modelo
 
-Abrir y ejecutar `training/train_notebook.ipynb` celda por celda. Al finalizar, se generará `runs/detect/train/weights/best.pt`.
+Abrir y ejecutar `training/train_notebook.ipynb` (Run All). Funciona en **local o Google Colab** (la primera celda detecta el entorno). Al finalizar genera `runs/detect/train/weights/best.pt` y lo copia a la raíz del repo.
 
-### 4. Procesar un video
+### 4. Procesar los videos
 
-1. Copiar 2-3 videos cortos (~20 segundos) a `videos/input/`.
-2. Abrir y ejecutar `inference/inference_notebook.ipynb`.
-3. El video procesado quedará en `videos/output/`.
+1. Tener los videos en `videos/input/` (ya hay 3; están gitignoreados, en Colab llegan por Drive).
+2. Abrir y ejecutar `inference/inference_notebook.ipynb` (Run All): procesa **todos** los videos de `videos/input/` con los 3 modelos en paralelo.
+3. Los videos procesados quedan en `videos/output/resultado_<nombre>.mp4`.
 
 ---
 
 ## 🧪 Modelo y configuración usada
 
-- **Modelo base**: `yolo26n.pt` (transfer learning)
-  - Si no existe esa versión exacta, reemplazar por la disponible (p.ej. `yolo11n.pt`, `yolo12n.pt`).
+- **Modelo base**: `yolo26n.pt` (transfer learning) — [YOLO26](https://docs.ultralytics.com/models/yolo26) está disponible en `ultralytics >= 8.4` (enero 2026); el notebook tiene fallback automático a `yolo11n.pt`.
 - **Épocas**: 80
 - **Batch size**: 16
 - **Image size**: 640
@@ -96,12 +99,12 @@ Abrir y ejecutar `training/train_notebook.ipynb` celda por celda. Al finalizar, 
 
 - [x] Notebooks (training + inference)
 - [x] Scripts (`utils.py`)
-- [x] Dataset etiquetado (`data/`)
+- [x] Dataset etiquetado (`data/mate-termo/`, 155 imágenes)
 - [x] `data/data.yaml`
-- [x] `best.pt` (pesos entrenados)
-- [ ] Video original
-- [ ] Video procesado final
-- [ ] Presentación (siguiendo `presentacion/estructura_presentacion.md`)
+- [x] Videos originales (`videos/input/`, 3 videos)
+- [ ] `best.pt` (pesos entrenados — correr el train notebook en Colab)
+- [ ] Videos procesados finales (`videos/output/` — correr el inference notebook)
+- [ ] Presentación (borrador en `presentacion/presentacion.md`, completar con métricas y frames)
 
 ---
 
@@ -114,5 +117,5 @@ Abrir y ejecutar `training/train_notebook.ipynb` celda por celda. Al finalizar, 
 
 ## ⚠️ Notas
 
-- **"YOLO26"** no es un nombre estándar de la familia YOLO al momento de la fecha. La librería `ultralytics` descarga automáticamente la última versión disponible. Si tu curso указал una versión específica, actualizá los checkpoints (`yolo26n.pt`, `yolo26n-seg.pt`, `yolo26n-pose.pt`) en los notebooks.
+- **YOLO26** fue lanzado por Ultralytics en enero 2026 e incluye los checkpoints usados en este trabajo: `yolo26n.pt` (detección), `yolo26n-seg.pt` (segmentación) y `yolo26n-pose.pt` (pose). Requiere `ultralytics >= 8.4` (los notebooks hacen `pip install -U`).
 - **Clases excluidas en segmentación COCO**: `person` y los nombres de las clases custom (mate, termo, factura). Las personas se detectan con el modelo de **Pose** y las clases custom con el modelo **Detection** entrenado.

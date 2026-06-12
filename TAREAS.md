@@ -10,8 +10,8 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 
 | Sem. | Fechas | Foco | Estado |
 |------|--------|------|--------|
-| S1 | Lun 2 – Dom 8 | Dataset + setup | ⏳ |
-| S2 | Lun 9 – Dom 15 | Entrenamiento + video + entrega | ⏳ |
+| S1 | Lun 2 – Dom 8 | Dataset + setup | ✅ |
+| S2 | Lun 9 – Dom 15 | Entrenamiento + video + entrega | ⏳ (al 12/06: falta entrenar, inferir y completar slides) |
 
 ---
 
@@ -19,11 +19,11 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 
 > Reunión inicial del grupo. Dejar todo cerrado por escrito.
 
-- [ ] **Confirmar 2-3 clases personalizadas** (Set A: mate, termo, factura · Set B: herramientas · Set C: deportivo · Set D: EPP)
-- [ ] **Verificar disponibilidad de GPU** (RTX propia / Colab Pro / Kaggle / CPU)
-- [ ] **Decidir herramienta de etiquetado** (recomendado: Roboflow)
-- [ ] **Asignar roles** del equipo (5 personas o menos → ver sugerencias abajo)
-- [ ] **Confirmar versión de YOLO** disponible en `ultralytics` (yolo11n · yolo12n · yolo26n)
+- [x] **Confirmar 2-3 clases personalizadas** → Set A: factura, mate, termo (orden 0/1/2 del export de Roboflow)
+- [x] **Verificar disponibilidad de GPU** → Google Colab (no hay GPU local)
+- [x] **Decidir herramienta de etiquetado** → Roboflow
+- [x] **Asignar roles** del equipo → Samuel + Fede
+- [x] **Confirmar versión de YOLO** → `yolo26n` (disponible en `ultralytics >= 8.4` desde enero 2026)
 
 ### 👥 Roles sugeridos (5 personas)
 
@@ -41,13 +41,13 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 
 > Esta es la etapa más larga. La calidad del dataset define el techo del modelo.
 
-- [ ] **Recolectar ≥50 imágenes por clase** (fotos propias, datasets públicos, descarga web con cuidado de licencia)
-- [ ] **Verificar que las clases NO estén en COCO** (no person, no remote, no cup, no bottle, etc.)
-- [ ] **Etiquetar cada imagen** en formato YOLO (`class_id cx cy w h`, normalizado 0-1)
-- [ ] **Split 80/20 train/val** (mínimo 40 train + 10 val por clase)
-- [ ] **Copiar a** `data/images/train|val/` y `data/labels/train|val/`
-- [ ] **Actualizar `data/data.yaml`** si se usan clases distintas a Set A
-- [ ] **Sanity check**: abrir 5-10 imágenes con sus labels para confirmar coherencia
+- [x] **Recolectar ≥50 imágenes por clase** → 155 imágenes totales (instancias: 172 factura, 55 mate, 35 termo)
+- [x] **Verificar que las clases NO estén en COCO** → factura/mate/termo no están en COCO ✓
+- [x] **Etiquetar cada imagen** → Roboflow, formato polígono YOLO (ultralytics lo convierte a bboxes para detect)
+- [x] **Split 80/20 train/val** → 124 train / 31 valid
+- [x] **Integrar al repo** → `data/mate-termo/` (estructura Roboflow, se commitea)
+- [x] **Actualizar `data/data.yaml`** → corregido: `0: factura, 1: mate, 2: termo` (orden del export de Roboflow)
+- [ ] **Sanity check**: correr la celda 3.1 del train notebook (dibuja labels sobre imágenes) antes de entrenar
 
 ### 🛠 Herramientas de etiquetado
 
@@ -91,14 +91,14 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 
 > Archivos: `videos/input/`
 
-- [ ] **Elegir/grabar 2-3 videos** de ~20 segundos cada uno
+- [x] **Elegir/grabar 2-3 videos** → 3 videos en `videos/input/` (video1/2/3.mp4)
 - [ ] **Verificar contenido de cada video**:
   - ✅ Al menos 1 persona visible (para pose)
   - ✅ Objetos COCO varios (auto, silla, botella, etc. — para segmentación)
   - ✅ Las 3 clases custom visibles (mate, termo, factura — para bboxes)
 - [ ] **Formato**: `.mp4` o `.avi` (codec compatible con OpenCV)
 - [ ] **Resolución sugerida**: 720p o 1080p (evitar 4K por performance)
-- [ ] **Copiar videos** a `videos/input/`
+- [x] **Copiar videos** a `videos/input/` (gitignoreados; en Colab llegan por el Drive compartido)
 
 ### 💡 Tips para los videos
 
@@ -139,9 +139,9 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 
 > **Entrega: lunes 15 de junio** · **Presentación: primer día hábil de la última semana**
 
-- [ ] **Limpiar notebooks** (markdown explicativo entre celdas, eliminar prints innecesarios)
-- [ ] **Actualizar README.md** con los resultados finales (clases elegidas, mAP, FPS)
-- [ ] **Armar presentación** siguiendo `presentacion/estructura_presentacion.md` (14 slides)
+- [x] **Limpiar notebooks** → outputs limpios, markdown explicativo, listos para Run All en Colab
+- [ ] **Actualizar README.md** con los resultados finales (dataset ya actualizado ✓; faltan mAP y FPS post-entrenamiento)
+- [ ] **Armar presentación** → borrador con las 14 slides en `presentacion/presentacion.md` ✓; completar los `[INSERTAR: ...]` con métricas y frames
 - [ ] **Capturar frames** del video procesado para las slides
 - [ ] **Capturar gráficas de Ultralytics** (loss, matriz de confusión, PR) — están en `runs/detect/train/`
 - [ ] **Verificar entregables** (checklist abajo)
@@ -201,14 +201,11 @@ jupyter notebook
 
 ## 📞 Decisiones pendientes
 
-Si todavía no decidiste algo, marcalo en este checklist y resolvelo en la reunión inicial:
+Todas resueltas al 12/06:
 
-- [ ] ¿Set A, B, C o D de clases?
-- [ ] ¿Quién es el Data Lead?
-- [ ] ¿Quién es el Trainer?
-- [ ] ¿Quién es el Vision Engineer?
-- [ ] ¿Roboflow o LabelImg?
-- [ ] ¿CPU, GPU local, Colab o Kaggle?
+- [x] ¿Set A, B, C o D de clases? → **Set A** (factura, mate, termo)
+- [x] ¿Roboflow o LabelImg? → **Roboflow**
+- [x] ¿CPU, GPU local, Colab o Kaggle? → **Google Colab** (Drive: `MyDrive/UGR/PDI_TP2/`)
 
 ---
 
