@@ -42,10 +42,14 @@ videos/output/*
 !videos/output/.gitkeep
 
 # Dataset (puede ser muy pesado; si lo suben, quitar de gitignore)
+# NOTA: data/mate-termo/ (export de Roboflow, ~7 MB) SI se commitea.
 data/images/train/*
 !data/images/train/.gitkeep
 data/images/val/*
 !data/images/val/.gitkeep
+
+# Config autogenerada por el train notebook (rutas absolutas de cada maquina)
+data/data_runtime.yaml
 # Si querés subir los labels pequeños:
 # !data/labels/train/
 # !data/labels/val/

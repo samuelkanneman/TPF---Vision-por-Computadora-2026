@@ -1,7 +1,8 @@
 # Dependencias del Trabajo Final - Vision por Computadora 2026
 # Instalar con: pip install -r requirements.txt
 
-ultralytics>=8.0.0
+# ultralytics >= 8.4 trae los pesos YOLO26 (detect/seg/pose, enero 2026)
+ultralytics>=8.4.0
 opencv-python>=4.8.0
 numpy>=1.24.0
 torch>=2.0.0
@@ -9,6 +10,7 @@ torchvision>=0.15.0
 Pillow>=10.0.0
 PyYAML>=6.0
 tqdm>=4.65.0
+matplotlib>=3.7.0
 
 # Opcionales - para etiquetado y descarga de datasets
 # roboflow>=1.0.0

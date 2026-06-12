@@ -1,27 +1,31 @@
 # data.yaml - Dataset custom para YOLO26
 # Proyecto Integrador - Vision por Computadora 2026
 #
-# IMPORTANTE: Este dataset esta armado con el SET A (gastronomia argentina):
-#   - mate
-#   - termo
-#   - factura
-# Si elegiste otro set de clases, modificar la seccion `names` abajo.
-# Las clases NO pueden estar incluidas en las 80 clases de COCO.
+# Dataset: data/mate-termo/ (export de Roboflow, 124 train + 31 valid)
+#   https://universe.roboflow.com/federicos-workspace-5cgiu/mate-termo-factura/dataset/1
+#
+# IMPORTANTE - orden de las clases:
+#   El export de Roboflow define 0=bolleria, 1=mate, 2=termo.
+#   "bolleria" es la factura (nombre del etiquetado original), por eso aca
+#   se renombra a "factura" PERO se respeta el orden 0/1/2 de los labels.
+#   NO cambiar el orden: los .txt de data/mate-termo/*/labels usan estos indices.
+#
+# NOTA: ultralytics resuelve un `path` relativo contra su datasets_dir global,
+# no contra este archivo. Por eso el notebook de entrenamiento genera
+# data/data_runtime.yaml con la ruta absoluta antes de entrenar (celda 4).
 
-# Ruta absoluta o relativa al directorio raiz del dataset
-# (debe apuntar a la carpeta que contiene `images/` y `labels/`)
-path: .
+# Ruta al directorio raiz del dataset (el notebook la vuelve absoluta en runtime)
+path: mate-termo
 
 # Subcarpetas de train y validacion (relativas a `path`)
-train: images/train
-val: images/val
+train: train/images
+val: valid/images
 
-# Nombres de las clases personalizadas
-# El indice (0, 1, 2) debe coincidir con el orden de los archivos .txt de labels
+# Nombres de las clases personalizadas (orden de Roboflow, NO modificar)
 names:
-  0: mate
-  1: termo
-  2: factura
+  0: factura
+  1: mate
+  2: termo
 
-# Numero de clases (opcional, ultralytics puede inferirlo)
+# Numero de clases
 nc: 3
