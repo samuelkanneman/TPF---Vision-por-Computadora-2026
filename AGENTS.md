@@ -116,10 +116,11 @@ pip install -r requirements.txt
    generación de `data/data_runtime.yaml` (3.2) — el entrenamiento usa ese
    yaml con rutas absolutas.
 4. Hiperparámetros (sección 5):
-   - `MODEL_NAME = 'yolo26n.pt'` (fallback automático a `yolo11n.pt`)
+   - `MODEL_NAME = 'yolo26s.pt'` (fallback automático a `yolo11s.pt`)
    - `data=data/data_runtime.yaml` (autogenerado)
-   - `epochs=80`, `batch=16` (bajar a 8 si OOM), `imgsz=640`
-   - `optimizer='AdamW'`, `patience=15`
+   - `epochs=150`, `batch=16` (bajar a 8 si OOM), `imgsz=640`
+   - `optimizer='AdamW'`, `patience=30`
+   - Historial: yolo26n + 80 ep dio mAP50 0.59 (factura 0.25, mate 0.72, termo 0.80)
 5. Correr. Resultado en `runs/detect/train/weights/best.pt`.
 6. Copiar `best.pt` a la raíz (sección 8 del notebook ya lo hace).
 

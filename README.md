@@ -84,12 +84,14 @@ Abrir y ejecutar `training/train_notebook.ipynb` (Run All). Funciona en **local 
 
 ## 🧪 Modelo y configuración usada
 
-- **Modelo base**: `yolo26n.pt` (transfer learning) — [YOLO26](https://docs.ultralytics.com/models/yolo26) está disponible en `ultralytics >= 8.4` (enero 2026); el notebook tiene fallback automático a `yolo11n.pt`.
-- **Épocas**: 80
+- **Modelo base**: `yolo26s.pt` (transfer learning) — [YOLO26](https://docs.ultralytics.com/models/yolo26) está disponible en `ultralytics >= 8.4` (enero 2026); el notebook tiene fallback automático a `yolo11s.pt`.
+- **Épocas**: 150 (early stopping con `patience=30`)
 - **Batch size**: 16
 - **Image size**: 640
 - **Optimizador**: AdamW
 - **Augmentations**: Activadas (default Ultralytics)
+
+> El primer entrenamiento (yolo26n, 80 épocas) dio mAP50 0.59 global con `factura` en 0.25 — se subió a `yolo26s` y más épocas para la versión final.
 
 > Ajustar estos valores según VRAM disponible y tiempo de entrenamiento.
 

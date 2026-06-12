@@ -68,8 +68,9 @@ Junio 2026
 
 # Configuración del entrenamiento
 
-- **Modelo base**: `yolo26n.pt` (nano) — *transfer learning* desde COCO
-- **Épocas**: 80 (con *early stopping*, `patience=15`)
+- **Modelo base**: `yolo26s.pt` (small) — *transfer learning* desde COCO
+  - Primera iteración con `yolo26n` (nano): mAP50 0.59 → se subió de tamaño
+- **Épocas**: 150 (con *early stopping*, `patience=30`)
 - **Batch size**: 16 · **Image size**: 640
 - **Optimizador**: AdamW, `lr0 = 0.001`
 - **Augmentations**: las default de Ultralytics (mosaic, flips, HSV, etc.)
@@ -142,7 +143,8 @@ sugiere etiquetado incompleto en bandejas más que falta de datos.
 **¿Por qué excluimos clases de la segmentación COCO?**
 
 - `person` → ya la representa el modelo de **pose** (skeleton); dibujar también la máscara duplicaría la anotación y ensuciaría el frame.
-- Clases custom → las dibuja el detector **custom** con bbox + confianza; si COCO segmentara algo parecido (ej. `cup`, `bottle`), habría doble anotación contradictoria.
+- Clases custom → las dibuja el detector **custom** con bbox + confianza.
+- **Pasó en la práctica**: COCO veía las facturas como `donut`/`cake` y el mate como `cup`, superponiendo máscaras sobre nuestras cajas → agregamos esas clases a la lista de exclusión (`EXTRA_EXCLUDE`).
 
 **Resultado**: cada objeto es responsabilidad de exactamente **un** modelo →
 frame limpio y sin solapamientos.
