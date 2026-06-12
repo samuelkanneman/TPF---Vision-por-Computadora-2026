@@ -9,7 +9,8 @@ Proyecto integrador que aplica modelos de la familia YOLO para detectar clases p
 ## 📁 Estructura del proyecto
 
 ```
-Trabajo Final/
+TPF---Vision-por-Computadora-2026/
+├── best.pt                        # Pesos entrenados (entregable principal)
 ├── data/
 │   ├── data.yaml                  # Configuración del dataset (apunta a mate-termo/)
 │   └── mate-termo/                # Dataset custom (export de Roboflow, 155 imágenes)
@@ -24,18 +25,20 @@ Trabajo Final/
 ├── inference/
 │   ├── inference_notebook.ipynb   # Notebook de inferencia sobre video
 │   └── utils.py                   # Funciones auxiliares de dibujo
-├── runs/detect/train/weights/
-│   ├── best.pt                    # Pesos entrenados (entregable)
-│   └── last.pt
 ├── videos/
-│   ├── input/                     # Videos de entrada (2-3 de ~20s)
-│   └── output/                    # Video procesado final
+│   ├── input/                     # Videos de entrada (3 de ~15-30s)
+│   └── output/                    # Videos procesados (resultado_video*.mp4)
 ├── presentacion/
-│   └── estructura_presentacion.md # Outline de la presentación
-├── Proyecto Integrador Visión por Computadora - 2026.pdf
+│   ├── presentacion.md            # Fuente de las slides (Marp, 15 slides)
+│   ├── presentacion_TPF.pptx      # Slides exportadas
+│   └── img/                       # Gráficas, frames y predicciones para las slides
 ├── requirements.txt
 └── README.md
 ```
+
+> Nota: `runs/` (carpeta de trabajo de Ultralytics) solo existe en la VM de Colab
+> durante el entrenamiento — está gitignoreada. Sus artefactos útiles ya están en
+> el repo: `best.pt` en la raíz y las gráficas en `presentacion/img/`.
 
 ---
 
@@ -54,7 +57,7 @@ Trabajo Final/
 - **155 imágenes** (124 train / 31 valid, split 80/20), etiquetadas con [Roboflow](https://universe.roboflow.com/federicos-workspace-5cgiu/mate-termo-factura/dataset/1) (licencia CC BY 4.0).
 - Instancias en train: 208 factura · 106 mate · 71 termo (en valid: 22 · 29 · 19).
 - Labels en formato polígono YOLO (export de segmentación); ultralytics los convierte automáticamente a bounding boxes para entrenar detección.
-- El dataset está **incluido en el repo** (`data/mate-termo/`, ~7 MB): con clonar alcanza, también en Colab.
+- El dataset está **incluido en el repo** (`data/mate-termo/`, ~7 MB).
 
 ---
 
@@ -76,7 +79,7 @@ Abrir y ejecutar `training/train_notebook.ipynb` (Run All). Funciona en **local 
 
 ### 4. Procesar los videos
 
-1. Tener los videos en `videos/input/` (los 3 videos ya están commiteados en el repo).
+1. Tener los videos en `videos/input/`.
 2. Abrir y ejecutar `inference/inference_notebook.ipynb` (Run All): procesa **todos** los videos de `videos/input/` con los 3 modelos en paralelo.
 3. Los videos procesados quedan en `videos/output/resultado_<nombre>.mp4`.
 
@@ -112,8 +115,6 @@ Historial de experimentos (mismo dataset):
 
 > Análisis: casi no hay confusión entre clases — los errores son objetos no detectados (recall), concentrados en `factura` (objetos chicos, agrupados en bandejas). Detalle en `presentacion/presentacion.md`.
 
-> Ajustar estos valores según VRAM disponible y tiempo de entrenamiento.
-
 ---
 
 ## 📦 Entregables
@@ -125,18 +126,11 @@ Historial de experimentos (mismo dataset):
 - [x] Videos originales (`videos/input/`, 3 videos)
 - [x] `best.pt` (pesos entrenados, yolo26n — en la raíz del repo)
 - [x] Videos procesados finales (`videos/output/resultado_video{1,2,3}.mp4`)
-- [x] Presentación (`presentacion/presentacion.md`, 15 slides con métricas y material en `presentacion/img/` — exportar a PPTX/PDF con Marp)
-
----
-
-## 📅 Fechas importantes
-
-- **Entrega notebooks**: Lunes 15 de junio
-- **Presentación**: Primer día hábil de la última semana de cursada
+- [x] Presentación (`presentacion/presentacion_TPF.pptx`, fuente Marp en `presentacion.md`)
 
 ---
 
 ## ⚠️ Notas
 
 - **YOLO26** fue lanzado por Ultralytics en enero 2026 e incluye los checkpoints usados en este trabajo: `yolo26n.pt` (detección), `yolo26n-seg.pt` (segmentación) y `yolo26n-pose.pt` (pose). Requiere `ultralytics >= 8.4` (los notebooks hacen `pip install -U`).
-- **Clases excluidas en segmentación COCO**: `person` y los nombres de las clases custom (mate, termo, factura). Las personas se detectan con el modelo de **Pose** y las clases custom con el modelo **Detection** entrenado.
+- **Clases excluidas en segmentación COCO**: `person`, las clases custom (factura, mate, termo) y sus "parientes" COCO (`donut`, `cake`, `cup`) para evitar doble anotación. Las personas se dibujan con el modelo de **Pose** y las clases custom con el modelo **Detection** entrenado.
