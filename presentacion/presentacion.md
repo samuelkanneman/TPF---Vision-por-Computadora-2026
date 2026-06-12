@@ -58,7 +58,7 @@ Junio 2026
 | **Clases (Set A)** | `0: factura` · `1: mate` · `2: termo` |
 | **¿Por qué?** | Objetos cotidianos argentinos, ausentes en COCO |
 | **Imágenes** | 155 (124 train / 31 valid, split 80/20) |
-| **Instancias (train)** | 172 factura · 55 mate · 35 termo |
+| **Instancias (train)** | 208 factura · 106 mate · 71 termo |
 | **Etiquetado** | Roboflow (polígonos YOLO), licencia CC BY 4.0 |
 
 [INSERTAR: captura de Roboflow con el dataset etiquetado]
@@ -100,8 +100,11 @@ Junio 2026
 
 [INSERTAR: 1-2 ejemplos de errores o falsos positivos]
 
-**Discusión**: qué clase funcionó mejor / peor y por qué
-(pista: el desbalance 172/55/35 sugiere que `termo` puede ser la más difícil).
+**Discusión**: qué clase funcionó mejor / peor y por qué.
+En el primer entrenamiento (yolo26n, 80 épocas), `factura` fue la clase más débil
+(mAP50 ≈ 0.25 vs 0.72 de `mate` y 0.80 de `termo`) **a pesar de ser la que más
+instancias tiene** — las facturas aparecen en grupos, chicas y pegadas, lo que
+sugiere etiquetado incompleto en bandejas más que falta de datos.
 
 ---
 
@@ -170,7 +173,7 @@ Qué observar:
 
 - **Nombres y orden de clases**: el export de Roboflow definía `0: bolleria, 1: mate, 2: termo`, distinto a la config inicial del repo → se corrigió `data.yaml` respetando los índices (si no, las clases quedaban cruzadas).
 - **Formato de labels**: Roboflow exportó polígonos (segmentación) en vez de bboxes → Ultralytics los convierte automáticamente para detección.
-- **Dataset desbalanceado**: 172 facturas vs 35 termos en train.
+- **Clase difícil**: `factura` rinde peor que `mate`/`termo` aun siendo la de más instancias (208 en train) — objetos chicos, agrupados en bandejas, posible etiquetado incompleto.
 - **Imágenes 512×512 con stretch** (preprocesado de Roboflow) → pérdida de relación de aspecto.
 - **Trabajo distribuido**: entrenamiento en Colab + repo en GitHub + videos por Drive.
 - [INSERTAR: dificultades de performance/FPS observadas en la inferencia]

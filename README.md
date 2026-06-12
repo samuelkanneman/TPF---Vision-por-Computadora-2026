@@ -52,7 +52,7 @@ Trabajo Final/
 ### 📊 Dataset
 
 - **155 imágenes** (124 train / 31 valid, split 80/20), etiquetadas con [Roboflow](https://universe.roboflow.com/federicos-workspace-5cgiu/mate-termo-factura/dataset/1) (licencia CC BY 4.0).
-- Instancias en train: 172 factura · 55 mate · 35 termo.
+- Instancias en train: 208 factura · 106 mate · 71 termo (en valid: 22 · 29 · 19).
 - Labels en formato polígono YOLO (export de segmentación); ultralytics los convierte automáticamente a bounding boxes para entrenar detección.
 - El dataset está **incluido en el repo** (`data/mate-termo/`, ~7 MB): con clonar alcanza, también en Colab.
 

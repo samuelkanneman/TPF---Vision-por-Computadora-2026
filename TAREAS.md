@@ -41,7 +41,7 @@ Roadmap operativo desde hoy (1 de junio) hasta la entrega del **lunes 15 de juni
 
 > Esta es la etapa más larga. La calidad del dataset define el techo del modelo.
 
-- [x] **Recolectar ≥50 imágenes por clase** → 155 imágenes totales (instancias: 172 factura, 55 mate, 35 termo)
+- [x] **Recolectar ≥50 imágenes por clase** → 155 imágenes totales (instancias en train: 208 factura, 106 mate, 71 termo)
 - [x] **Verificar que las clases NO estén en COCO** → factura/mate/termo no están en COCO ✓
 - [x] **Etiquetar cada imagen** → Roboflow, formato polígono YOLO (ultralytics lo convierte a bboxes para detect)
 - [x] **Split 80/20 train/val** → 124 train / 31 valid
